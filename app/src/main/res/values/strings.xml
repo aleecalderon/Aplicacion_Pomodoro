@@ -1,4 +1,5 @@
 <resources>
+<<<<<<< HEAD
     <string name="app_name">Task Timer</string>
     <string name="hint_task_name">Nombre de la tarea</string>
     <string name="btn_add">Agregar</string>
@@ -11,3 +12,7 @@
     <string name="label_pending">Pendientes</string>
     <string name="default_time">00:00:00</string>
 </resources>
+=======
+    <string name="app_name">Investigacion1</string>
+</resources>
+>>>>>>> 5215dd0fbe865b625229fdef8e4fc15d7be3b867
