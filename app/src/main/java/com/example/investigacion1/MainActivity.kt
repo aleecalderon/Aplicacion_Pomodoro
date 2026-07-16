@@ -22,7 +22,6 @@ class MainActivity : AppCompatActivity() {
     // Contadores para el resumen
     private var tareasPendientes = 0
     private var sesionesCompletadas = 0
-
     private var totalTareas = 0
 
     private var activeTask: TextView? = null
@@ -33,9 +32,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Estado inicial de botones del temporizador
         binding.btnPause.isEnabled = false
         binding.btnResume.isEnabled = false
         binding.btnReset.isEnabled = false
+
+        // Inicializar texto del resumen al arrancar la app
+        updateCountText()
 
         // 1. LÓGICA DE LOS BOTONES DEL TEMPORIZADOR
         binding.btnStart.setOnClickListener {
@@ -73,9 +76,7 @@ class MainActivity : AppCompatActivity() {
             for (i in 0 until binding.containerTasks.childCount) {
 
                 val taskView = binding.containerTasks.getChildAt(i)
-
-                val title =
-                    taskView.findViewById<TextView>(R.id.tv_task_title)
+                val title = taskView.findViewById<TextView>(R.id.tv_task_title)
 
                 if (title.text.toString().equals(taskText, true)) {
 
@@ -90,7 +91,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             addTask(taskText)
-
             binding.inputTask.text.clear()
         }
     }
@@ -112,6 +112,7 @@ class MainActivity : AppCompatActivity() {
                 updateTimerInterface()
                 updateCountText()
                 addHistoryItem() // Guarda en el historial
+
                 Toast.makeText(
                     this@MainActivity,
                     "Pomodoro completado para:\n$activeTaskName",
@@ -160,7 +161,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.textTimer.text = timeFormatted
 
-        // Actualiza la barrita roja de progreso
+        // Actualiza la barra roja de progreso
         val progress = (timeLeftInMillis.toFloat() / START_TIME_IN_MILLIS.toFloat() * 100).toInt()
         binding.progressTimer.progress = progress
     }
@@ -184,8 +185,8 @@ class MainActivity : AppCompatActivity() {
         // -------------------------------------------------
         taskBinding.root.setOnClickListener {
 
-            // Si ya había una tarea activa, le quitamos el color
-            activeTask?.setBackgroundColor(android.graphics.Color.WHITE)
+            // Si ya había una tarea activa, le quitamos el color de fondo
+            activeTask?.setBackgroundColor(android.graphics.Color.TRANSPARENT)
 
             // Guardamos la nueva tarea activa
             activeTask = taskBinding.tvTaskTitle
@@ -198,30 +199,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         // -------------------------------------------------
-        // CHECKBOX
+        // CHECKBOX (Marcar como completada)
         // -------------------------------------------------
         taskBinding.cbTask.setOnCheckedChangeListener { _, isChecked ->
 
             if (isChecked) {
-
                 taskBinding.tvTaskTitle.paintFlags =
                     taskBinding.tvTaskTitle.paintFlags or
                             android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
 
                 taskBinding.tvTaskTitle.alpha = 0.5f
-
                 tareasPendientes--
-
             } else {
-
                 taskBinding.tvTaskTitle.paintFlags =
                     taskBinding.tvTaskTitle.paintFlags and
                             android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
 
                 taskBinding.tvTaskTitle.alpha = 1f
-
                 tareasPendientes++
-
             }
 
             if (activeTask == taskBinding.tvTaskTitle) {
@@ -232,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // -------------------------------------------------
-        // ELIMINAR
+        // ELIMINAR TAREA
         // -------------------------------------------------
         taskBinding.btnDeleteTask.setOnClickListener {
 
@@ -242,8 +237,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             binding.containerTasks.removeView(taskBinding.root)
-
             totalTareas--
+
             // Si era la tarea activa
             if (activeTask == taskBinding.tvTaskTitle) {
                 activeTask = null
@@ -252,13 +247,13 @@ class MainActivity : AppCompatActivity() {
 
             updateCountText()
 
-            // Mostrar mensaje si ya no hay tareas
+            // Mostrar mensaje si ya no hay tareas en la lista
             if (binding.containerTasks.childCount == 0) {
                 binding.textEmptyTasks.visibility = View.VISIBLE
             }
         }
 
-        // Agregamos la vista al contenedor
+        // Agregamos la vista al contenedor de la UI
         binding.containerTasks.addView(taskBinding.root)
 
         tareasPendientes++
@@ -271,33 +266,29 @@ class MainActivity : AppCompatActivity() {
         binding.textEmptyHistory.visibility = View.GONE
 
         val historyView = layoutInflater.inflate(R.layout.item_history, null)
+        val tvHistoryItem = historyView.findViewById<TextView>(R.id.tv_history_item)
 
-        val tvHistoryItem =
-            historyView.findViewById<TextView>(R.id.tv_history_item)
-
-        tvHistoryItem.text =
-            """
-Sesión $sesionesCompletadas
-
-Tarea:
-$activeTaskName
-
-Duración:
-25 minutos
+        tvHistoryItem.text = """
+            Sesión $sesionesCompletadas
+            
+            Tarea:
+            $activeTaskName
+            
+            Duración:
+            25 minutos
         """.trimIndent()
 
+        // Agrega el historial nuevo arriba de los anteriores
         binding.containerHistory.addView(historyView, 0)
     }
 
     private fun updateCountText() {
-
-        binding.textSummary.text =
-            """
-Pendientes: $tareasPendientes
-
-Total tareas: $totalTareas
-
-Pomodoros completados: $sesionesCompletadas
+        binding.textSummary.text = """
+            Pendientes: $tareasPendientes
+            
+            Total tareas: $totalTareas
+            
+            Pomodoros completados: $sesionesCompletadas
         """.trimIndent()
     }
 }
