@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.example.tasktimer.app-debug-37:/layout_item_task.xml.flat",
+        "source": "com.example.tasktimer.app-main-39:/layout/item_task.xml"
+    },
+    {
+        "merged": "com.example.tasktimer.app-debug-37:/layout_activity_main.xml.flat",
+        "source": "com.example.tasktimer.app-main-39:/layout/activity_main.xml"
+    }
+]
