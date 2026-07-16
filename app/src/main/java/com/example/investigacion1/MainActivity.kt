@@ -3,12 +3,11 @@ package com.example.investigacion1
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.investigacion1.databinding.ActivityMainBinding
+import com.example.investigacion1.databinding.ItemTaskBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,10 +23,19 @@ class MainActivity : AppCompatActivity() {
     private var tareasPendientes = 0
     private var sesionesCompletadas = 0
 
+    private var totalTareas = 0
+
+    private var activeTask: TextView? = null
+    private var activeTaskName: String = "Sin tarea seleccionada"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.btnPause.isEnabled = false
+        binding.btnResume.isEnabled = false
+        binding.btnReset.isEnabled = false
 
         // 1. LÓGICA DE LOS BOTONES DEL TEMPORIZADOR
         binding.btnStart.setOnClickListener {
@@ -48,14 +56,42 @@ class MainActivity : AppCompatActivity() {
 
         // 2. LÓGICA DEL BOTÓN "AGREGAR TAREA"
         binding.btnAddTask.setOnClickListener {
-            val taskText = binding.inputTask.text.toString()
-            if (taskText.isNotEmpty()) {
-                addTask(taskText) // Llama a la función para crear la tarea
-                binding.inputTask.text.clear() // Limpia el cuadro de texto
-            } else {
-                // Muestra un mensajito si el usuario no escribió nada
-                Toast.makeText(this, "Por favor escribe una tarea", Toast.LENGTH_SHORT).show()
+
+            val taskText = binding.inputTask.text.toString().trim()
+
+            if (taskText.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Por favor escribe una tarea",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
             }
+
+            // Verifica si ya existe una tarea con ese nombre
+            for (i in 0 until binding.containerTasks.childCount) {
+
+                val taskView = binding.containerTasks.getChildAt(i)
+
+                val title =
+                    taskView.findViewById<TextView>(R.id.tv_task_title)
+
+                if (title.text.toString().equals(taskText, true)) {
+
+                    Toast.makeText(
+                        this,
+                        "Esa tarea ya existe",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    return@setOnClickListener
+                }
+            }
+
+            addTask(taskText)
+
+            binding.inputTask.text.clear()
         }
     }
 
@@ -76,15 +112,32 @@ class MainActivity : AppCompatActivity() {
                 updateTimerInterface()
                 updateCountText()
                 addHistoryItem() // Guarda en el historial
-                Toast.makeText(this@MainActivity, "¡Pomodoro terminado!", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    "Pomodoro completado para:\n$activeTaskName",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                binding.btnStart.isEnabled = true
+                binding.btnPause.isEnabled = false
+                binding.btnResume.isEnabled = false
+                binding.btnReset.isEnabled = false
             }
         }.start()
         timerRunning = true
+
+        binding.btnStart.isEnabled = false
+        binding.btnPause.isEnabled = true
+        binding.btnResume.isEnabled = false
+        binding.btnReset.isEnabled = true
     }
 
     private fun pauseTimer() {
         countDownTimer?.cancel()
         timerRunning = false
+
+        binding.btnPause.isEnabled = false
+        binding.btnResume.isEnabled = true
     }
 
     private fun resetTimer() {
@@ -92,6 +145,12 @@ class MainActivity : AppCompatActivity() {
         timerRunning = false
         timeLeftInMillis = START_TIME_IN_MILLIS
         updateTimerInterface()
+
+        binding.btnStart.isEnabled = true
+        binding.btnPause.isEnabled = false
+        binding.btnResume.isEnabled = false
+        binding.btnReset.isEnabled = false
+        binding.progressTimer.progress = 100
     }
 
     private fun updateTimerInterface() {
@@ -110,50 +169,135 @@ class MainActivity : AppCompatActivity() {
     // FUNCIONES DE TAREAS E HISTORIAL DINÁMICO
     // =======================================================
     private fun addTask(taskName: String) {
-        // Oculta el texto "No hay tareas creadas aún"
+
+        // Oculta el mensaje de lista vacía
         binding.textEmptyTasks.visibility = View.GONE
 
-        // Infla (crea) la vista usando tu archivo item_task.xml
-        val taskView = layoutInflater.inflate(R.layout.item_task, null)
+        // Creamos la vista usando View Binding
+        val taskBinding = ItemTaskBinding.inflate(layoutInflater)
 
-        // Busca los elementos dentro de esa nueva vista
-        val tvTaskTitle = taskView.findViewById<TextView>(R.id.tv_task_title)
-        val btnDeleteTask = taskView.findViewById<Button>(R.id.btn_delete_task)
+        // Colocamos el nombre de la tarea
+        taskBinding.tvTaskTitle.text = taskName
 
-        // Le pone el nombre que el usuario escribió
-        tvTaskTitle.text = taskName
+        // -------------------------------------------------
+        // SELECCIONAR TAREA ACTIVA
+        // -------------------------------------------------
+        taskBinding.root.setOnClickListener {
 
-        // Lógica del botón "Eliminar" en cada tarea
-        btnDeleteTask.setOnClickListener {
-            binding.containerTasks.removeView(taskView) // Lo borra de la pantalla
-            tareasPendientes--
+            // Si ya había una tarea activa, le quitamos el color
+            activeTask?.setBackgroundColor(android.graphics.Color.WHITE)
+
+            // Guardamos la nueva tarea activa
+            activeTask = taskBinding.tvTaskTitle
+            activeTaskName = taskName
+
+            // La pintamos para indicar que está seleccionada
+            activeTask?.setBackgroundColor(android.graphics.Color.parseColor("#FFF59D"))
+
+            Toast.makeText(this, "Tarea activa: $taskName", Toast.LENGTH_SHORT).show()
+        }
+
+        // -------------------------------------------------
+        // CHECKBOX
+        // -------------------------------------------------
+        taskBinding.cbTask.setOnCheckedChangeListener { _, isChecked ->
+
+            if (isChecked) {
+
+                taskBinding.tvTaskTitle.paintFlags =
+                    taskBinding.tvTaskTitle.paintFlags or
+                            android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+
+                taskBinding.tvTaskTitle.alpha = 0.5f
+
+                tareasPendientes--
+
+            } else {
+
+                taskBinding.tvTaskTitle.paintFlags =
+                    taskBinding.tvTaskTitle.paintFlags and
+                            android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
+
+                taskBinding.tvTaskTitle.alpha = 1f
+
+                tareasPendientes++
+
+            }
+
+            if (activeTask == taskBinding.tvTaskTitle) {
+                activeTask = null
+                activeTaskName = "Sin tarea seleccionada"
+            }
+            updateCountText()
+        }
+
+        // -------------------------------------------------
+        // ELIMINAR
+        // -------------------------------------------------
+        taskBinding.btnDeleteTask.setOnClickListener {
+
+            // Si no estaba completada, resta una pendiente
+            if (!taskBinding.cbTask.isChecked) {
+                tareasPendientes--
+            }
+
+            binding.containerTasks.removeView(taskBinding.root)
+
+            totalTareas--
+            // Si era la tarea activa
+            if (activeTask == taskBinding.tvTaskTitle) {
+                activeTask = null
+                activeTaskName = "Sin tarea seleccionada"
+            }
+
             updateCountText()
 
-            // Si ya no hay tareas, vuelve a mostrar el mensaje vacío
-            if (tareasPendientes == 0) {
+            // Mostrar mensaje si ya no hay tareas
+            if (binding.containerTasks.childCount == 0) {
                 binding.textEmptyTasks.visibility = View.VISIBLE
             }
         }
 
-        // Agrega la tarea a la pantalla
-        binding.containerTasks.addView(taskView)
+        // Agregamos la vista al contenedor
+        binding.containerTasks.addView(taskBinding.root)
+
         tareasPendientes++
+        totalTareas++
         updateCountText()
     }
 
     private fun addHistoryItem() {
+
         binding.textEmptyHistory.visibility = View.GONE
 
         val historyView = layoutInflater.inflate(R.layout.item_history, null)
-        val tvHistoryItem = historyView.findViewById<TextView>(R.id.tv_history_item)
 
-        tvHistoryItem.text = "Sesión $sesionesCompletadas: Completada - 25 min"
+        val tvHistoryItem =
+            historyView.findViewById<TextView>(R.id.tv_history_item)
 
-        // Agrega el historial (el 0 hace que se ponga al principio de la lista)
+        tvHistoryItem.text =
+            """
+Sesión $sesionesCompletadas
+
+Tarea:
+$activeTaskName
+
+Duración:
+25 minutos
+        """.trimIndent()
+
         binding.containerHistory.addView(historyView, 0)
     }
 
     private fun updateCountText() {
-        binding.textSummary.text = "Tareas pendientes: $tareasPendientes | Sesiones completadas: $sesionesCompletadas"
+
+        binding.textSummary.text =
+            """
+Pendientes: $tareasPendientes
+
+Total tareas: $totalTareas
+
+Pomodoros completados: $sesionesCompletadas
+        """.trimIndent()
     }
 }
