@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F4F6F9"> <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="18dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFEBEB" android:padding="20dp"
+        android:gravity="center"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TEMPORIZADOR"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#E056FD"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/text_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25:00"
+            android:textSize="54sp"
+            android:textStyle="bold"
+            android:textColor="#D63031" /> <ProgressBar
+        android:id="@+id/progress_timer"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="20dp"
+        android:max="100"
+        android:progress="100"
+        android:progressTint="#D63031" /> <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:text="Iniciar"
+            android:backgroundTint="#2ECC71" /> <Button
+        android:id="@+id/btn_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:text="Pausar"
+        android:backgroundTint="#F1C40F"
+        android:textColor="#000000" /> <Button
+        android:id="@+id/btn_resume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:text="Reanudar"
+        android:backgroundTint="#3498DB" /> <Button
+        android:id="@+id/btn_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:text="Reiniciar"
+        android:backgroundTint="#95A5A6" /> </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#EBF5FB" android:padding="12dp"
+        android:layout_marginBottom="20dp">
+
+        <EditText
+            android:id="@+id/input_task"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="¿En qué vas a trabajar?"
+            android:textColorHint="#7F8C8D"
+            android:importantForAutofill="no"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btn_add_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Agregar"
+            android:backgroundTint="#2980B9" /> </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FCF3CF" android:padding="12dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/text_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tareas pendientes: 0 | Sesiones completadas: 0"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#D35400" /> </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lista de Tareas"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#2C3E50"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/text_empty_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No hay tareas creadas aún."
+        android:textColor="#95A5A6"
+        android:layout_marginBottom="16dp"
+        android:gravity="center" />
+
+    <LinearLayout
+        android:id="@+id/container_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Historial Pomodoro"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#2C3E50"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/text_empty_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No se han registrado sesiones Pomodoro."
+        android:textColor="#95A5A6"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:id="@+id/container_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+</LinearLayout>
+</ScrollView>
