@@ -1,0 +1,36 @@
+R_DEF: Internal format may change without notice
+local
+color accent_green
+color background_light
+color black
+color card_background
+color purple_500
+color purple_700
+color teal_200
+color teal_700
+color text_secondary
+color white
+id btnAddTask
+id btnComplete
+id btnStartPause
+id etTaskName
+id rvHistory
+id rvPendingTasks
+id tvActiveTaskLabel
+id tvItemName
+id tvItemTime
+id tvTimer
+layout activity_main
+layout item_task
+string app_name
+string btn_add
+string btn_complete
+string btn_pause
+string btn_start
+string default_time
+string hint_task_name
+string label_active_task
+string label_history
+string label_no_active_task
+string label_pending
+style Theme.TaskTimerApp
